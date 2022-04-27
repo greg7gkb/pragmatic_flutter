@@ -72,6 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -81,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            showLocalImage(),
+            showRemoteImage(),
             Text(
               'You have pushed the button this many times:',
               style: Theme.of(context).textTheme.headline6,
@@ -101,12 +102,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget showLocalImage() {
-    const double d = 250;
+  Widget showRemoteImage() {
+    const double d = 500;
     return Container(
         width: d,
         height: d,
         padding: const EdgeInsets.all(20),
-        child: Image.asset("assets/flutter_icon.png"));
+        child: Image.network("https://static.scientificamerican.com/sciam/cache/file/1DDFE633-2B85-468D-B28D05ADAE7D1AD8_source.jpg?w=590&h=800")
+    );
   }
 }
