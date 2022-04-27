@@ -15,15 +15,6 @@ class HelloBooksApp extends StatelessWidget {
       // debugShowCheckedModeBanner: false,
       title: title,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.red,
       ),
       home: const MyHomePage(title: title + ' Home Page'),
@@ -33,20 +24,69 @@ class HelloBooksApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class MyTextFieldWidget extends StatefulWidget {
+  const MyTextFieldWidget({Key? key}) : super(key: key);
+
+  @override
+  State createState() => _MyTextFieldWidgetState();
+}
+
+class _MyTextFieldWidgetState extends State<MyTextFieldWidget> {
+  late TextEditingController _controller;
+  String userText = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.redAccent)
+      ),
+      margin: const EdgeInsets.all(30),
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Input text here:',
+            style: Theme.of(context).textTheme.headline6,
+          ),
+          TextField(
+              autofocus: false,
+              controller: _controller,
+              onSubmitted: (String value) async {
+                setState(() {
+                  userText = value;
+                  _controller.clear();
+                });
+              }
+          ),
+          Text(
+            userText,
+            style: Theme.of(context).textTheme.headline4,
+          )
+        ],
+      ),
+    );
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -91,6 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            const MyTextFieldWidget(),
           ],
         ),
       ),
@@ -103,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget showRemoteImage() {
-    const double d = 500;
+    const double d = 250;
     return Container(
         width: d,
         height: d,
