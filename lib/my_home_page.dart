@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
+import 'g.dart' as g;
 import 'my_text_field_widget.dart';
 import 'my_future_with_placeholder.dart';
 
@@ -46,9 +48,15 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            showRemoteImage(),
+            FittedBox( // Prevents Row children from being drawn off screen
+              child: Row(children: [
+                showRemoteImage(),
+                showRemoteImage(),
+                showRemoteImage(),
+              ])
+            ),
             Text(
-              'You have pushed the button this many times:',
+              'You pushed the button this many times:',
               style: Theme.of(context).textTheme.headline6,
             ),
             Text(
@@ -71,14 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget showRemoteImage() {
     const double d = 250;
     return Container(
-        width: d,
-        height: d,
-        padding: const EdgeInsets.all(20),
-        child: Image.network("https://static.scientificamerican.com/sciam/cache/file/1DDFE633-2B85-468D-B28D05ADAE7D1AD8_source.jpg?w=590&h=800")
+      width: d,
+      height: d,
+      padding: const EdgeInsets.all(20),
+      child: Image.network("https://static.scientificamerican.com/sciam/cache/file/1DDFE633-2B85-468D-B28D05ADAE7D1AD8_source.jpg?w=590&h=800")
     );
   }
 
   Future<void> showAlertDialog(BuildContext context) {
+    developer.log('showing alert dialog', name: g.appName);
     return showDialog(
         context: context,
         builder: (BuildContext context) {
