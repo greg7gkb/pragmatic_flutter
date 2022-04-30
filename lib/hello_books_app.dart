@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'my_home_page.dart';
+import 'books_home.dart';
 
 class HelloBooksApp extends StatelessWidget {
   const HelloBooksApp({Key? key}) : super(key: key);
@@ -15,7 +15,7 @@ class HelloBooksApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: const MyHomePage(title: title + ' Home Page'),
+      home: const BooksHome(title: title + ' Home Page'),
     );
   }
 }
