@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'themes.dart';
 import 'books_home.dart';
 
 class HelloBooksApp extends StatelessWidget {
@@ -9,12 +10,11 @@ class HelloBooksApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const String title = 'Hello Books!';
+
     return MaterialApp(
       // debugShowCheckedModeBanner: false,
       title: title,
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
+      theme: defaultTheme,
       home: const BooksHome(title: title + ' Home Page'),
     );
   }

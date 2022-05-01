@@ -1,18 +1,38 @@
+import 'themes.dart' as _themes;
 import 'package:flutter/material.dart';
 
-class BooksHome extends StatelessWidget {
+class BooksHome extends StatefulWidget {
   const BooksHome({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
+  State<StatefulWidget> createState() => _BooksHomeState();
+}
+
+class _BooksHomeState extends State<BooksHome> {
+  var theme = _themes.defaultTheme;
+
+  void _switchTheme() {
+    setState(() {
+      theme = _themes.next(theme);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: const BooksList(),
-    );
+    return Theme(
+        data: theme,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+          ),
+          body: const BooksList(),
+          floatingActionButton: FloatingActionButton(
+            onPressed: _switchTheme,
+            tooltip: 'Change Theme',
+            child: const Icon(Icons.change_circle),
+          ),
+        ));
   }
 }
 
@@ -75,8 +95,11 @@ class BookCard extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     '${booksListing[index]['title']}',
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                   booksListing[index]['authors'] != null
                       ? Text(
