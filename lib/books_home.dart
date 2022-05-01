@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'themes.dart' as _themes;
 import 'package:flutter/material.dart';
 
@@ -10,16 +11,29 @@ class BooksHome extends StatefulWidget {
 }
 
 class _BooksHomeState extends State<BooksHome> {
+  _BooksHomeState() {
+    dev.log('_BooksHomeState()');
+  }
+
+
   var theme = _themes.defaultTheme;
+
+  @override
+  void initState() {
+    super.initState();
+    dev.log('initState()');
+  }
 
   void _switchTheme() {
     setState(() {
+      dev.log('setState()');
       theme = _themes.next(theme);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    dev.log('build()');
     return Theme(
         data: theme,
         child: Scaffold(
