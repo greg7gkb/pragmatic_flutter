@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 import 'themes.dart' as _themes;
+import 'http.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +21,7 @@ class _BooksHomeState extends State<BooksHome> {
   }
 
   _themes.WrappedTheme _theme = _themes.defaultTheme;
+  late Future<List<bool>> _futures;
 
   Future<bool> _restoreTheme() async {
     var prefs = await SharedPreferences.getInstance();
@@ -31,11 +33,21 @@ class _BooksHomeState extends State<BooksHome> {
     return true;
   }
 
+  Future<bool> _makeHttpCall() async {
+    var rtn = await makeHttpCall();
+    dev.log('http response: $rtn');
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
-    _restoreTheme();
     dev.log('initState(), theme: ${_theme.id}');
+
+    _futures = Future.wait([
+      _restoreTheme(),
+      _makeHttpCall(),
+    ]);
   }
 
   void _switchTheme() async {
@@ -49,15 +61,15 @@ class _BooksHomeState extends State<BooksHome> {
   }
 
   @override
-  Widget build(BuildContext context) => FutureBuilder<bool>(
+  Widget build(BuildContext context) => FutureBuilder(
         // Wrap our build in a future to wait for async shared prefs to load
         // before first rendering the UI.
-        future: _restoreTheme(),
+        future: _futures,
         builder: (context, snapshot) =>
-            snapshot.hasData ? _buildWidget(snapshot.data) : const SizedBox(),
+            snapshot.hasData ? _buildWidget() : const SizedBox(),
       );
 
-  Widget _buildWidget(bool? data) {
+  Widget _buildWidget() {
     dev.log('buildWidget()');
     return Theme(
         data: _theme.theme,
