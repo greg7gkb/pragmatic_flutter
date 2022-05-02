@@ -14,7 +14,7 @@ class HelloBooksApp extends StatelessWidget {
     return MaterialApp(
       // debugShowCheckedModeBanner: false,
       title: title,
-      theme: defaultTheme,
+      theme: defaultTheme.theme,
       home: const BooksHome(title: title + ' Home Page'),
     );
   }

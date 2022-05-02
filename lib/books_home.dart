@@ -1,10 +1,14 @@
 import 'dart:developer' as dev;
 import 'themes.dart' as _themes;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+const String keyOfThemeId = 'theme_id';
 
 class BooksHome extends StatefulWidget {
-  const BooksHome({Key? key, required this.title}) : super(key: key);
   final String title;
+
+  const BooksHome({Key? key, required this.title}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _BooksHomeState();
@@ -15,27 +19,48 @@ class _BooksHomeState extends State<BooksHome> {
     dev.log('_BooksHomeState()');
   }
 
+  _themes.WrappedTheme _theme = _themes.defaultTheme;
 
-  var theme = _themes.defaultTheme;
+  Future<bool> _restoreTheme() async {
+    var prefs = await SharedPreferences.getInstance();
+    var val = prefs.getInt(keyOfThemeId);
+    if (val != null) {
+      _theme = _themes.getById(val);
+      dev.log('loaded theme of id: ${_theme.id}');
+    }
+    return true;
+  }
 
   @override
   void initState() {
     super.initState();
-    dev.log('initState()');
+    _restoreTheme();
+    dev.log('initState(), theme: ${_theme.id}');
   }
 
-  void _switchTheme() {
+  void _switchTheme() async {
     setState(() {
-      dev.log('setState()');
-      theme = _themes.next(theme);
+      _theme = _themes.next(_theme);
+      dev.log('setState(), theme: ${_theme.id}');
     });
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setInt(keyOfThemeId, _theme.id);
+    dev.log('saved theme to shared prefs');
   }
 
   @override
-  Widget build(BuildContext context) {
-    dev.log('build()');
+  Widget build(BuildContext context) => FutureBuilder<bool>(
+        // Wrap our build in a future to wait for async shared prefs to load
+        // before first rendering the UI.
+        future: _restoreTheme(),
+        builder: (context, snapshot) =>
+            snapshot.hasData ? _buildWidget(snapshot.data) : const SizedBox(),
+      );
+
+  Widget _buildWidget(bool? data) {
+    dev.log('buildWidget()');
     return Theme(
-        data: theme,
+        data: _theme.theme,
         child: Scaffold(
           appBar: AppBar(
             title: Text(widget.title),
