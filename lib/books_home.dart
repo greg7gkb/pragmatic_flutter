@@ -1,8 +1,9 @@
+import 'bookmodel.dart';
 import 'dart:developer' as dev;
-import 'themes.dart' as _themes;
 import 'http.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'themes.dart' as _themes;
 
 const String keyOfThemeId = 'theme_id';
 
@@ -21,7 +22,7 @@ class _BooksHomeState extends State<BooksHome> {
   }
 
   _themes.WrappedTheme _theme = _themes.defaultTheme;
-  late Future<List<bool>> _futures;
+  late Future<bool> futureLoader;
 
   Future<bool> _restoreTheme() async {
     var prefs = await SharedPreferences.getInstance();
@@ -33,21 +34,11 @@ class _BooksHomeState extends State<BooksHome> {
     return true;
   }
 
-  Future<bool> _makeHttpCall() async {
-    var rtn = await makeHttpCall();
-    dev.log('http response: $rtn');
-    return true;
-  }
-
   @override
   void initState() {
     super.initState();
+    futureLoader = _restoreTheme();
     dev.log('initState(), theme: ${_theme.id}');
-
-    _futures = Future.wait([
-      _restoreTheme(),
-      _makeHttpCall(),
-    ]);
   }
 
   void _switchTheme() async {
@@ -64,7 +55,7 @@ class _BooksHomeState extends State<BooksHome> {
   Widget build(BuildContext context) => FutureBuilder(
         // Wrap our build in a future to wait for async shared prefs to load
         // before first rendering the UI.
-        future: _futures,
+        future: _restoreTheme(),
         builder: (context, snapshot) =>
             snapshot.hasData ? _buildWidget() : const SizedBox(),
       );
@@ -87,45 +78,44 @@ class _BooksHomeState extends State<BooksHome> {
   }
 }
 
-List fetchBookData() {
-  return [
-    {
-      'title': 'Book Title',
-      'authors': ['Author1', 'Author2'],
-      'image': 'assets/books_icon.webp'
-    },
-    {
-      'title': 'Book Title 2',
-      'authors': ['Author1'],
-      'image': null,
-    },
-    {
-      'title': 'Book Title 3',
-      'authors': ['Author1', 'Author2'],
-      'image': 'assets/books_icon.webp'
-    },
-  ];
-}
-
-final booksListing = fetchBookData();
-
-class BooksList extends StatelessWidget {
+class BooksList extends StatefulWidget {
   const BooksList({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  State<StatefulWidget> createState() => _BooksListState();
+}
+
+class _BooksListState extends State<BooksList> {
+  _BooksListState() {
+    dev.log('_BooksListState()');
+  }
+
+  final Future<List<BookModel>> futureHttp = makeHttpCall();
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<List<BookModel>>(
+        // Wrap our build in a future to wait for async shared prefs to load
+        // before first rendering the UI.
+        future: futureHttp,
+        builder: (context, snapshot) => snapshot.hasData
+            ? _buildWidget(snapshot.data as List<BookModel>)
+            : const SizedBox(),
+      );
+
+  Widget _buildWidget(List<BookModel> books) {
     return ListView.builder(
-        itemCount: booksListing.length,
+        itemCount: books.length,
         itemBuilder: (context, index) {
-          return BookCard(index);
+          return BookCard(index, books[index]);
         });
   }
 }
 
 class BookCard extends StatelessWidget {
   final int index;
+  final BookModel book;
 
-  const BookCard(this.index, {Key? key}) : super(key: key);
+  const BookCard(this.index, this.book, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -145,19 +135,28 @@ class BookCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    '${booksListing[index]['title']}',
+                    book.volumeInfo.title,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).primaryColor,
                     ),
                   ),
-                  booksListing[index]['authors'] != null
+                  book.volumeInfo.subtitle != null
                       ? Text(
-                          'Author(s): ${booksListing[index]['authors'].join(", ")}',
+                          '${book.volumeInfo.subtitle}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).secondaryHeaderColor,
+                          ),
+                        )
+                      : const SizedBox(),
+                  book.volumeInfo.authors != null
+                      ? Text(
+                          'Author(s): ${book.volumeInfo.authors?.join(", ")}',
                           style: const TextStyle(fontSize: 14),
                         )
-                      : const Text(""),
+                      : const SizedBox(),
                 ],
               ),
             ),
@@ -166,9 +165,9 @@ class BookCard extends StatelessWidget {
                   minHeight: 100,
                   maxHeight: 100,
                 ),
-                child: booksListing[index]['image'] != null
-                    ? Image.asset(
-                        booksListing[index]['image'],
+                child: book.volumeInfo.imageLinks?.smallThumbnail != null
+                    ? Image.network(
+                        book.volumeInfo.imageLinks?.smallThumbnail as String,
                         fit: BoxFit.fitHeight,
                       )
                     : Container())
