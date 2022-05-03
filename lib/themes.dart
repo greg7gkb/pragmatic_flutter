@@ -26,6 +26,11 @@ class WrappedTheme {
 
   @override
   int get hashCode => theme.hashCode;
+
+  @override
+  String toString() {
+    return 'WrappedTheme{id: $id}';
+  }
 }
 
 get _pinkTheme => WrappedTheme(

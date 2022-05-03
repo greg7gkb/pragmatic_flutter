@@ -1,6 +1,7 @@
 import 'bookmodel.dart';
 import 'dart:developer' as dev;
 import 'http.dart';
+import 'navigator_args_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'themes.dart' as _themes;
@@ -68,7 +69,11 @@ class _BooksHomeState extends State<BooksHome> {
           appBar: AppBar(
             title: Text(widget.title),
           ),
-          body: const BooksList(),
+          // TODO: this is pretty janky, passing the theme down.
+          // Instead, we should be managing the app theme globally as in:
+          // https://www.raywenderlich.com/16628777-theming-a-flutter-app-getting-started
+          // Requires a bunch of refactoring though.
+          body: BooksList(theme: _theme),
           floatingActionButton: FloatingActionButton(
             onPressed: _switchTheme,
             tooltip: 'Change Theme',
@@ -79,7 +84,9 @@ class _BooksHomeState extends State<BooksHome> {
 }
 
 class BooksList extends StatefulWidget {
-  const BooksList({Key? key}) : super(key: key);
+  final _themes.WrappedTheme theme;
+
+  const BooksList({required this.theme, Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _BooksListState();
@@ -106,7 +113,7 @@ class _BooksListState extends State<BooksList> {
     return ListView.builder(
         itemCount: books.length,
         itemBuilder: (context, index) {
-          return BookCard(index, books[index]);
+          return BookCard(index, books[index], widget.theme);
         });
   }
 }
@@ -114,66 +121,75 @@ class _BooksListState extends State<BooksList> {
 class BookCard extends StatelessWidget {
   final int index;
   final BookModel book;
+  final _themes.WrappedTheme theme;
 
-  const BookCard(this.index, this.book, {Key? key}) : super(key: key);
+  const BookCard(this.index, this.book, this.theme, {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      elevation: 5,
-      margin: const EdgeInsets.all(10),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    book.volumeInfo.title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  book.volumeInfo.subtitle != null
-                      ? Text(
-                          '${book.volumeInfo.subtitle}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).secondaryHeaderColor,
-                          ),
-                        )
-                      : const SizedBox(),
-                  book.volumeInfo.authors != null
-                      ? Text(
-                          'Author(s): ${book.volumeInfo.authors?.join(", ")}',
-                          style: const TextStyle(fontSize: 14),
-                        )
-                      : const SizedBox(),
-                ],
-              ),
+    return GestureDetector(
+        onTap: () => Navigator.pushNamed(
+              context,
+              '/details',
+              arguments: NavigatorArgsWrapper(book, theme),
             ),
-            ConstrainedBox(
-                constraints: const BoxConstraints(
-                  minHeight: 100,
-                  maxHeight: 100,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          elevation: 5,
+          margin: const EdgeInsets.all(10),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        book.volumeInfo.title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      book.volumeInfo.subtitle != null
+                          ? Text(
+                              '${book.volumeInfo.subtitle}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Theme.of(context).secondaryHeaderColor,
+                              ),
+                            )
+                          : const SizedBox(),
+                      book.volumeInfo.authors != null
+                          ? Text(
+                              'Author(s): ${book.volumeInfo.authors?.join(", ")}',
+                              style: const TextStyle(fontSize: 14),
+                            )
+                          : const SizedBox(),
+                    ],
+                  ),
                 ),
-                child: book.volumeInfo.imageLinks?.smallThumbnail != null
-                    ? Image.network(
-                        book.volumeInfo.imageLinks?.smallThumbnail as String,
-                        fit: BoxFit.fitHeight,
-                      )
-                    : Container())
-          ],
-        ),
-      ),
-    );
+                ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minHeight: 100,
+                      maxHeight: 100,
+                    ),
+                    child: book.volumeInfo.imageLinks?.smallThumbnail != null
+                        ? Image.network(
+                            book.volumeInfo.imageLinks?.smallThumbnail
+                                as String,
+                            fit: BoxFit.fitHeight,
+                          )
+                        : Container())
+              ],
+            ),
+          ),
+        ));
   }
 }
