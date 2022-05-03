@@ -18,10 +18,6 @@ class BooksHome extends StatefulWidget {
 }
 
 class _BooksHomeState extends State<BooksHome> {
-  _BooksHomeState() {
-    dev.log('_BooksHomeState()');
-  }
-
   _themes.WrappedTheme _theme = _themes.defaultTheme;
   late Future<bool> futureLoader;
 
@@ -30,7 +26,6 @@ class _BooksHomeState extends State<BooksHome> {
     var val = prefs.getInt(keyOfThemeId);
     if (val != null) {
       _theme = _themes.getById(val);
-      dev.log('loaded theme of id: ${_theme.id}');
     }
     return true;
   }
@@ -39,17 +34,14 @@ class _BooksHomeState extends State<BooksHome> {
   void initState() {
     super.initState();
     futureLoader = _restoreTheme();
-    dev.log('initState(), theme: ${_theme.id}');
   }
 
   void _switchTheme() async {
     setState(() {
       _theme = _themes.next(_theme);
-      dev.log('setState(), theme: ${_theme.id}');
     });
     var prefs = await SharedPreferences.getInstance();
     prefs.setInt(keyOfThemeId, _theme.id);
-    dev.log('saved theme to shared prefs');
   }
 
   @override
@@ -62,7 +54,6 @@ class _BooksHomeState extends State<BooksHome> {
       );
 
   Widget _buildWidget() {
-    dev.log('buildWidget()');
     return Theme(
         data: _theme.theme,
         child: Scaffold(
@@ -93,10 +84,6 @@ class BooksList extends StatefulWidget {
 }
 
 class _BooksListState extends State<BooksList> {
-  _BooksListState() {
-    dev.log('_BooksListState()');
-  }
-
   final Future<List<BookModel>> futureHttp = makeHttpCall();
 
   @override

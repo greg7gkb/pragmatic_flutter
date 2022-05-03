@@ -24,9 +24,8 @@ class HelloBooksApp extends StatelessWidget {
   }
 
   Route<dynamic> generateRoute(RouteSettings routeSettings) {
-    final args = routeSettings.arguments;
-
     dev.log('Trying to route to: ${routeSettings.name}');
+    final args = routeSettings.arguments;
     switch (routeSettings.name) {
       case '/':
         return MaterialPageRoute(

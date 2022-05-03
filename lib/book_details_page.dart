@@ -12,18 +12,17 @@ class BookDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    dev.log('theme is: ${theme.toString()}');
     return Theme(
         data: theme.theme,
         child: Scaffold(
-        appBar: AppBar(
-          title: Text(book.volumeInfo.title),
-        ),
-        body: Container(
-          padding: const EdgeInsets.all(20),
-          child: Text(book.volumeInfo.description == null
-              ? "No description available"
-              : book.volumeInfo.description as String),
-        )));
+            appBar: AppBar(
+              title: Text(book.volumeInfo.title),
+            ),
+            body: Container(
+              padding: const EdgeInsets.all(20),
+              child: Text(book.volumeInfo.description == null
+                  ? "No description available"
+                  : book.volumeInfo.description as String),
+            )));
   }
 }
