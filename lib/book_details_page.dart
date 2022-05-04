@@ -3,7 +3,6 @@ Clone of file in book's source code repo:
 https://github.com/ptyagicodecamp/pragmatic_flutter/blob/master/lib/chapter15/book_details_page.dart
  */
 import 'bookmodel.dart';
-import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:hello_books/themes.dart';
 import 'package:url_launcher/url_launcher.dart';

@@ -1,5 +1,4 @@
 import 'bookmodel.dart';
-import 'dart:developer' as dev;
 import 'http.dart';
 import 'navigator_args_wrapper.dart';
 import 'package:flutter/material.dart';
