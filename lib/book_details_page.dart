@@ -64,22 +64,24 @@ class InformationWidget extends StatelessWidget {
               Text(
                 book.volumeInfo.title,
                 style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold
+                    ),
               ),
               book.volumeInfo.subtitle != null
                   ? Text(
                       '${book.volumeInfo.subtitle}',
-                      style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FontStyle.italic),
+                      style: TextStyle(
+                          color: Theme.of(context).secondaryHeaderColor,
+                          fontSize: 14),
                     )
                   : Container(),
               book.volumeInfo.authors != null
                   ? Text(
                       'Author(s): ${book.volumeInfo.authors?.join(", ")}',
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 14),
                     )
                   : Container(),
               book.volumeInfo.publisher != null
